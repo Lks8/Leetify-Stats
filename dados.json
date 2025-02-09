@@ -1,0 +1,202 @@
+[
+    {
+        "jogador": "Lks8",
+        "mapas": [
+            {
+                "mapa": "Mirage",
+                "win_rate": "63%",
+                "partidas_jogadas": "25",
+                "estatisticas": {
+                    "LEETIFY RATING": "+3.90",
+                    "T RATING": "+4.60",
+                    "CT RATING": "+2.48"
+                }
+            },
+            {
+                "mapa": "Inferno",
+                "win_rate": "42%",
+                "partidas_jogadas": "19",
+                "estatisticas": {
+                    "LEETIFY RATING": "+6.28",
+                    "T RATING": "+5.91",
+                    "CT RATING": "+4.37"
+                }
+            },
+            {
+                "mapa": "Nuke",
+                "win_rate": "75%",
+                "partidas_jogadas": "17",
+                "estatisticas": {
+                    "LEETIFY RATING": "+8.26",
+                    "T RATING": "+5.93",
+                    "CT RATING": "+10.73"
+                }
+            },
+            {
+                "mapa": "Dust2",
+                "win_rate": "42%",
+                "partidas_jogadas": "12",
+                "estatisticas": {
+                    "LEETIFY RATING": "+3.51",
+                    "T RATING": "+5.11",
+                    "CT RATING": "+3.35"
+                }
+            },
+            {
+                "mapa": "Train",
+                "win_rate": "50%",
+                "partidas_jogadas": "9",
+                "estatisticas": {
+                    "LEETIFY RATING": "+7.01",
+                    "T RATING": "+5.95",
+                    "CT RATING": "+8.43"
+                }
+            },
+            {
+                "mapa": "Ancient",
+                "win_rate": "63%",
+                "partidas_jogadas": "8",
+                "estatisticas": {
+                    "LEETIFY RATING": "+6.36",
+                    "T RATING": "+3.93",
+                    "CT RATING": "+6.50"
+                }
+            },
+            {
+                "mapa": "Anubis",
+                "win_rate": "67%",
+                "partidas_jogadas": "6",
+                "estatisticas": {
+                    "LEETIFY RATING": "+4.33",
+                    "T RATING": "+2.80",
+                    "CT RATING": "+3.05"
+                }
+            },
+            {
+                "mapa": "Vertigo",
+                "win_rate": "67%",
+                "partidas_jogadas": "3",
+                "estatisticas": {
+                    "LEETIFY RATING": "+4.79",
+                    "T RATING": "+1.88",
+                    "CT RATING": "+9.18"
+                }
+            },
+            {
+                "mapa": "Office",
+                "win_rate": "0%",
+                "partidas_jogadas": "1",
+                "estatisticas": {
+                    "LEETIFY RATING": "+3.46",
+                    "T RATING": "+3.07",
+                    "CT RATING": "+4.03"
+                }
+            }
+        ]
+    },
+    {
+        "jogador": "⛧VÉIO DO KING CRIMSON⛧",
+        "mapas": [
+            {
+                "mapa": "Mirage",
+                "win_rate": "74%",
+                "partidas_jogadas": "20",
+                "estatisticas": {
+                    "LEETIFY RATING": "+1.97",
+                    "T RATING": "+2.87",
+                    "CT RATING": "+1.54"
+                }
+            },
+            {
+                "mapa": "Inferno",
+                "win_rate": "63%",
+                "partidas_jogadas": "17",
+                "estatisticas": {
+                    "LEETIFY RATING": "+1.23",
+                    "T RATING": "+3.02",
+                    "CT RATING": "-0.04"
+                }
+            },
+            {
+                "mapa": "Nuke",
+                "win_rate": "65%",
+                "partidas_jogadas": "17",
+                "estatisticas": {
+                    "LEETIFY RATING": "+2.80",
+                    "T RATING": "+1.70",
+                    "CT RATING": "+3.23"
+                }
+            },
+            {
+                "mapa": "Dust2",
+                "win_rate": "27%",
+                "partidas_jogadas": "11",
+                "estatisticas": {
+                    "LEETIFY RATING": "+0.31",
+                    "T RATING": "+0.42",
+                    "CT RATING": "-0.04"
+                }
+            },
+            {
+                "mapa": "Train",
+                "win_rate": "43%",
+                "partidas_jogadas": "8",
+                "estatisticas": {
+                    "LEETIFY RATING": "+1.55",
+                    "T RATING": "-1.24",
+                    "CT RATING": "+4.66"
+                }
+            },
+            {
+                "mapa": "Vertigo",
+                "win_rate": "75%",
+                "partidas_jogadas": "8",
+                "estatisticas": {
+                    "LEETIFY RATING": "+0.46",
+                    "T RATING": "-1.98",
+                    "CT RATING": "+3.46"
+                }
+            },
+            {
+                "mapa": "Ancient",
+                "win_rate": "43%",
+                "partidas_jogadas": "7",
+                "estatisticas": {
+                    "LEETIFY RATING": "+1.59",
+                    "T RATING": "+0.99",
+                    "CT RATING": "+0.95"
+                }
+            },
+            {
+                "mapa": "Anubis",
+                "win_rate": "17%",
+                "partidas_jogadas": "6",
+                "estatisticas": {
+                    "LEETIFY RATING": "-1.42",
+                    "T RATING": "-1.96",
+                    "CT RATING": "-2.76"
+                }
+            },
+            {
+                "mapa": "Overpass",
+                "win_rate": "40%",
+                "partidas_jogadas": "5",
+                "estatisticas": {
+                    "LEETIFY RATING": "+3.03",
+                    "T RATING": "+1.05",
+                    "CT RATING": "+2.35"
+                }
+            },
+            {
+                "mapa": "Office",
+                "win_rate": "0%",
+                "partidas_jogadas": "1",
+                "estatisticas": {
+                    "LEETIFY RATING": "+3.45",
+                    "T RATING": "+2.66",
+                    "CT RATING": "+4.63"
+                }
+            }
+        ]
+    }
+]

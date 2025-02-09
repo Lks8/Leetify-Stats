@@ -1,0 +1,151 @@
+<html>
+
+<head></head>
+<div id="playerName"></div>
+
+<div id="tentativaPorXhttp"></div>
+
+<div id="el"></div>
+
+<form action="https://leetify.com/app/profile/76561198069883546">
+    <input type="submit" value="Go to Google" />
+</form>
+
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+<script type="module" src="main.js"></script>
+
+<script>
+
+    function doTimeout(ms) {
+        setTimeout(function () {
+            // window.alert("checking if ids is saved after 10s?");
+            // window.alert("In timeout ids=" + window.ids);
+            var ids = window.ids; //is non empty
+        }, ms);
+    }
+
+    function sleep(ms, callback) {
+        var start = new Date().getTime(), expire = start + ms;
+        while (new Date().getTime() < expire) { }
+        callback(ms);
+    }
+
+    function waitForElm(selector) {
+        return new Promise(resolve => {
+            if (document.querySelector(selector)) {
+                return resolve(document.querySelector(selector));
+            }
+
+            const observer = new MutationObserver(mutations => {
+                if (document.querySelector(selector)) {
+                    observer.disconnect();
+                    resolve(document.querySelector(selector));
+                }
+            });
+
+            // If you get "parameter 1 is not of type 'Node'" error, see https://stackoverflow.com/a/77855838/492336
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    }
+
+    window.onload = async function () {
+        console.log("não rodou:");
+        rodaTudo();
+
+    };
+
+    async function rodaTudo() {
+        // const { Builder, By, until } = require('selenium-webdriver');
+
+
+
+        (async () => {
+            const browser = await puppeteer.launch({ headless: false }); // Define headless: true para rodar sem abrir o navegador
+            const page = await browser.newPage();
+
+            await page.goto('https://leetify.com/public/profile/76561198069883546', { waitUntil: 'networkidle2' });
+
+            const content = await page.evaluate(() => document.querySelector('app-root')?.innerText);
+            console.log("content do gpt:", content);
+
+            await browser.close();
+        })();
+
+
+        // (async function example() {
+        //     let driver = await new Builder().forBrowser('chrome').build();
+
+        //     try {
+        //         await driver.get('https://leetify.com/public/profile/76561198069883546');
+        //         let element = await driver.wait(until.elementLocated(By.css('app-root')), 10000);
+        //         console.log(await element.getText());
+        //     } finally {
+        //         await driver.quit();
+        //     }
+        // })();
+
+        console.log("meu pau");
+
+        // var url = require('url');
+        var url = 'https://leetify.com/public/profile/76561198069883546';
+        // var q = url.parse(adr, true);
+        // console.log(q);
+
+
+        document.getElementById("playerName").innerHTML = 13;
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                sleep(4000, doTimeout);
+                console.log(this.responseXML);
+                var tentativaPorXhttp = this.responseXML;
+            }
+        };
+        xhttp.open("GET", url, true);
+        xhttp.send();
+
+        fetch(url)
+            .then(sleep(5000, doTimeout))
+            .then(response => response.text())
+            .then(data => console.log(document.querySelector("body > app-root")))
+        // .then(sleep(10000, doTimeout))
+
+        $.get(url, function (data) {
+
+            // console.log(data); // return data/page
+            var el = document.createElement('html');
+            el.innerHTML = data;
+
+            console.log(el);
+
+            console.log("Done load.");
+            sleep(1000, doTimeout);
+            var button = document.querySelector("#maps > div.expand-wrapper > button");
+
+            var changedData = data;
+            while (changedData === data) {
+                sleep(2000, doTimeout);
+                console.log("nada mudou");
+                break;
+            }
+
+            while (document.querySelector("#maps > div.cards > section:nth-child(1) > header > div.inner > h3") == null) {
+                sleep(1000, doTimeout);
+                console.log(document.querySelector("#maps > div.cards > section:nth-child(1) > header > div.inner > h3"));
+                break;
+            }
+
+
+            console.log(document.querySelector("#maps > div.cards.--expanded > section:nth-child(1) > header > div.inner > h3"));
+        });
+
+
+    }
+</script>
+
+</html>
