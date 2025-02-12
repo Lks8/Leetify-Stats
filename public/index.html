@@ -103,7 +103,6 @@
 
     <script>
         let data = "";
-        let mapsSet = new Set();
         let charts = {};
         const colors = [
             "rgba(255, 0, 0, 0.6)",     // Red
@@ -128,7 +127,7 @@
                 document.getElementById('loading-message').innerText = "Erro ao carregar os dados.";
             }
 
-            kickstartMyGraphs(data, mapsSet);
+            kickstartMyGraphs();
         }
 
         async function getPlayersData() {
@@ -150,7 +149,6 @@
         function mapPlayersData() {
             // creates a set of maps and the html that will be included at tables and graphs
             let html = '';
-            let mapsSet = new Set();
 
             // maps data for each player
             data.forEach(player => {
@@ -172,7 +170,6 @@
                 // this part was a mess, now it's a bit easier to check which data goes where
                 // maps each stat from player
                 player.stats.forEach(stat => {
-                    mapsSet.add(stat.map);
                     let values = {
                         win_rate: parseFloat(stat.win_rate.replace('%', '')) || 0,
                         matches_played: parseInt(stat.matches_played) || 0,
@@ -212,61 +209,70 @@
             document.getElementById('data-container').innerHTML = html;
         }
 
-        function kickstartMyGraphs(mapsSet) {
+        function kickstartMyGraphs() {
             // THIS IS WHERE I STOPPED, IT'S 2AM
             // GO TO SLEEP FFS
             // TOMORROW WE'LL KEEP ON FIXING THE CHAT'S MESS
             // LOVE U BUDDY :3
 
             // draw graphs
-            // let maps = Array.from(mapsSet);
-            // criarGrafico("winrateChart", "Vitórias (%)", maps, data, "win_rate");
-            // criarGrafico("leetifyChart", "Leetify Rating", maps, data, "leetify_rating");
-            // criarGrafico("tSideChart", "Rating TR", maps, data, "t_rating");
-            // criarGrafico("ctSideChart", "Rating CT", maps, data, "ct_rating");
+            drawGraph("winrateChart", "Vitórias (%)", data, "win_rate");
+            drawGraph("leetifyChart", "Leetify Rating", data, "leetify_rating");
+            drawGraph("tSideChart", "Rating TR", data, "t_rating");
+            drawGraph("ctSideChart", "Rating CT", data, "ct_rating");
         }
 
-        function getMean(values) {
-            return mean = values.length ? values.reduce((a, b) => a + b, 0) / values.length : 0;
-        }
-
-        function criarGrafico(idCanvas, titulo, mapas, jogadores, chave) {
+        function drawGraph(idCanvas, graphTitle, data, key) {
             let ctx = document.getElementById(idCanvas).getContext("2d");
 
             if (charts[idCanvas]) {
                 charts[idCanvas].destroy();
             }
 
+            let labels = new Set();
             let datasets = [];
-            let mediaGeral = {};
+            let meanValues = {};
 
-            mapas.forEach(mapa => {
-                let valores = jogadores.map(jogador => {
-                    let mapaDados = jogador.mapas.find(m => m.mapa === mapa);
-                    return mapaDados ? parseFloat(mapaDados[chave]) || 0 : 0;
-                });
-
-                mediaGeral[mapa] = getMean(valores);
+            data.forEach(player => {
+                player.stats.forEach(stat => labels.add(stat.map));
             });
 
-            let index = 0;
-            jogadores.forEach(jogador => {
+            labels = Array.from(labels);
+
+            labels.forEach(label => {
+                meanValues[label] = { sum: 0, count: 0 };
+            });
+
+            data.forEach((player, index) => {
+                let values = labels.map(label => {
+                    let stat = player.stats.find(stat => stat.map === label);
+                    let value = stat ? parseFloat(stat[key]) || 0 : 0;
+
+                    if (!meanValues[label]) {
+                        meanValues[label] = { sum: 0, count: 0 };
+                    }
+                    meanValues[label].sum += value;
+                    meanValues[label].count++;
+
+                    return value;
+                });
+
                 datasets.push({
-                    label: jogador.jogador,
-                    data: mapas.map(mapa => {
-                        let mapaDados = jogador.mapas.find(m => m.mapa === mapa);
-                        return mapaDados ? parseFloat(mapaDados[chave]) || 0 : 0;
-                    }),
-                    backgroundColor: colors[index % colors.length], // Define a cor para cada jogador
-                    borderColor: colors[index % colors.length], // Mantém a mesma cor para a borda
+                    label: player.playerName,
+                    data: values,
+                    backgroundColor: colors[index % colors.length],
+                    borderColor: colors[index % colors.length],
                     borderWidth: 1
                 });
-                index++; // Incrementa o índice a cada iteração
             });
+
+            let meanData = labels.map(label =>
+                meanValues[label].count > 0 ? meanValues[label].sum / meanValues[label].count : 0
+            );
 
             datasets.push({
                 label: "Média Geral",
-                data: mapas.map(mapa => mediaGeral[mapa]),
+                data: meanData,
                 backgroundColor: "black",
                 borderColor: "black",
                 borderWidth: 2,
@@ -275,10 +281,16 @@
 
             charts[idCanvas] = new Chart(ctx, {
                 type: "bar",
-                data: { labels: mapas, datasets },
+                data: {
+                    labels: labels,
+                    datasets: datasets
+                },
                 options: {
                     indexAxis: "y",
-                    plugins: { legend: { position: "top" }, title: { display: true, text: titulo } }
+                    plugins: {
+                        legend: { position: "top" },
+                        title: { display: true, text: graphTitle }
+                    }
                 }
             });
         }

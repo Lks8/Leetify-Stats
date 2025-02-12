@@ -12,7 +12,8 @@ app.get("/response", async (req, res) => {
         { id: "76561198047160329", name: "Noob" },
         { id: "76561199035813483", name: "Bob" },
         { id: "76561199405152849", name: "Edy" },
-        { id: "76561198063283230", name: "Pira" }
+        { id: "76561198063283230", name: "Pira" },
+        { id: "76561198025516757", name: "Fer"}
     ];
 
     // start puppeteer
@@ -70,9 +71,13 @@ app.get("/response", async (req, res) => {
             playerName: playerName,
             stats: activeRotationData
         });
+
+        console.log(playerName + "'s data was succesfully loaded!");
     }
     await browser.close();
     res.json(allPlayersData);
+
+    console.log("Data sent!");
 });
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}, go to http://localhost:${PORT}/response for the full JSON`));
