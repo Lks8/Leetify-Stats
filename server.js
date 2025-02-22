@@ -13,7 +13,8 @@ app.get("/response", async (req, res) => {
         { id: "76561199035813483", name: "Bob" },
         { id: "76561199405152849", name: "Edy" },
         { id: "76561198063283230", name: "Pira" },
-        { id: "76561198025516757", name: "Fer"}
+        { id: "76561198025516757", name: "Fer" },
+        { id: "76561198117725021", name: "Toninho" }
     ];
 
     // start puppeteer

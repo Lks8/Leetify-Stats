@@ -6,90 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados do Leetify</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- of course... Chat is going to put the style at head tag and not in a separated CSS file... I hate this -->
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-
-        #data-container {
-            width: 100%;
-            font-size: 15px;
-        }
-
-        .container {
-            width: 80%;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        th,
-        td {
-            border: 1px solid black;
-            padding: 12px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #007BFF;
-            color: white;
-        }
-
-        h1,
-        h2 {
-            color: #007BFF;
-        }
-
-        .chart-container {
-            width: 100%;
-            margin: 30px auto;
-        }
-
-        .positive {
-            color: green;
-        }
-
-        .negative {
-            color: red;
-        }
-
-        .best {
-            color: black;
-            font-weight: bold;
-            background-color: gold;
-        }
-    </style>
 </head>
 
 <body>
     <div class="container">
         <h1>Estatísticas do Leetify</h1>
-        <form>
-            <input type="checkbox" id="Lks8" value="Lks8">
-            <label for="Lks8">Lks8</label>
-            <input type="checkbox" id="Noob" value="Noob">
-            <label for="Noob">Noob</label>
-            <input type="checkbox" id="Bob" value="Bob">
-            <label for="Bob">Bob</label>
-            <input type="checkbox" id="Edy" value="Edy">
-            <label for="Edy">Edy</label>
-            <input type="checkbox" id="Pira" value="Pira">
-            <label for="Pira">Pira</label>
 
-            <input type="submit" value="Selecionar Jogadores">
-        </form>
+        <h3>Compare players:</h3>
+        <form class="compare-players" action="javascript:comparePlayers();"></form>
+
+        <div class="pc"></div>
         <p id="loading-message">Carregando dados...</p>
 
         <div id="data-container"></div>
@@ -100,201 +26,327 @@
         <div class="chart-container"><canvas id="ctSideChart"></canvas></div>
     </div>
     </div>
-
-    <script>
-        let data = "";
-        let charts = {};
-        const colors = [
-            "rgba(255, 0, 0, 0.6)",     // Red
-            "rgba(0, 0, 255, 0.6)",     // Blue
-            "rgba(225, 225, 0, 0.6)",   // Yellow
-            "rgba(0, 200, 0, 0.6)",     // Green
-            "rgba(255, 100, 0, 0.6)",   // Orange
-            "rgba(0, 150, 0, 0.6)",     // Dark Green
-            "rgba(128, 0, 128, 0.6)",   // Purple
-            "rgba(0, 0, 128, 0.6)",     // Dark Blue
-        ];
-
-        // it all starts here
-        kickstartMyData();
-
-        async function kickstartMyData() {
-            try {
-                await getPlayersData();
-                mapPlayersData();
-            } catch (error) {
-                console.error("Erro ao carregar dados:", error);
-                document.getElementById('loading-message').innerText = "Erro ao carregar os dados.";
-            }
-
-            kickstartMyGraphs();
-        }
-
-        async function getPlayersData() {
-            // adds a loading status to screen
-            document.getElementById('loading-message').innerText = "Carregando dados...";
-            document.getElementById('data-container').innerHTML = "";
-
-            // fetches data from server
-            const response = await fetch('/response');
-            data = await response.json();
-
-            // checks if there's any data received
-            if (!data.length) {
-                document.getElementById('loading-message').innerText = "Nenhum dado encontrado.";
-                return;
-            }
-        }
-
-        function mapPlayersData() {
-            // creates a set of maps and the html that will be included at tables and graphs
-            let html = '';
-
-            // maps data for each player
-            data.forEach(player => {
-                html += `<h2>${player.playerName}</h2>`;
-                html += `<table>
-                                <tr>
-                                    <th>Mapa</th>
-                                    <th>Vitórias (%)</th>
-                                    <th>Partidas</th>
-                                    <th>Rating Leetify</th>
-                                    <th>Rating TR</th>
-                                    <th>Rating CT</th>
-                                </tr>`;
-
-                // win rates and matches played can't go lower than zero, but ratings don't have a minimum value
-                let bestStats = { win_rate: 0, matches_played: 0, leetify_rating: -Infinity, t_rating: -Infinity, ct_rating: -Infinity };
-                let tableData = [];
-
-                // this part was a mess, now it's a bit easier to check which data goes where
-                // maps each stat from player
-                player.stats.forEach(stat => {
-                    let values = {
-                        win_rate: parseFloat(stat.win_rate.replace('%', '')) || 0,
-                        matches_played: parseInt(stat.matches_played) || 0,
-                        leetify_rating: parseFloat(stat.leetify_rating) || 0,
-                        t_rating: parseFloat(stat.t_rating) || 0,
-                        ct_rating: parseFloat(stat.ct_rating) || 0
-                    };
-
-                    // saves the lowest value in each stat
-                    for (let key in values) {
-                        if (values[key] > bestStats[key]) {
-                            bestStats[key] = values[key];
-                        }
-                    }
-
-                    // this is the final formatted data that will end up at the table
-                    tableData.push({ map: stat.map, values });
-                });
-
-                // adds data to table, formatting the best values of each column, as well as positives and negatives of ratings
-                tableData.forEach(({ map, values }) => {
-                    html += `<tr>
-                                    <td>${map}</td>
-                                    <td class="${values.win_rate === bestStats.win_rate ? 'best' : ''}">${values.win_rate}%</td>
-                                    <td class="${values.matches_played === bestStats.matches_played ? 'best' : ''}">${values.matches_played}</td>
-                                    <td class="${values.leetify_rating === bestStats.leetify_rating ? 'best' : (values.leetify_rating >= 0 ? 'positive' : 'negative')}">${values.leetify_rating}</td>
-                                    <td class="${values.t_rating === bestStats.t_rating ? 'best' : (values.t_rating >= 0 ? 'positive' : 'negative')}">${values.t_rating}</td>
-                                    <td class="${values.ct_rating === bestStats.ct_rating ? 'best' : (values.ct_rating >= 0 ? 'positive' : 'negative')}">${values.ct_rating}</td>
-                                </tr>`;
-                });
-
-                html += '</table>';
-            });
-
-            // removes loading
-            document.getElementById('loading-message').innerText = "";
-            document.getElementById('data-container').innerHTML = html;
-        }
-
-        function kickstartMyGraphs() {
-            // THIS IS WHERE I STOPPED, IT'S 2AM
-            // GO TO SLEEP FFS
-            // TOMORROW WE'LL KEEP ON FIXING THE CHAT'S MESS
-            // LOVE U BUDDY :3
-
-            // draw graphs
-            drawGraph("winrateChart", "Vitórias (%)", data, "win_rate");
-            drawGraph("leetifyChart", "Leetify Rating", data, "leetify_rating");
-            drawGraph("tSideChart", "Rating TR", data, "t_rating");
-            drawGraph("ctSideChart", "Rating CT", data, "ct_rating");
-        }
-
-        function drawGraph(idCanvas, graphTitle, data, key) {
-            let ctx = document.getElementById(idCanvas).getContext("2d");
-
-            if (charts[idCanvas]) {
-                charts[idCanvas].destroy();
-            }
-
-            let labels = new Set();
-            let datasets = [];
-            let meanValues = {};
-
-            data.forEach(player => {
-                player.stats.forEach(stat => labels.add(stat.map));
-            });
-
-            labels = Array.from(labels);
-
-            labels.forEach(label => {
-                meanValues[label] = { sum: 0, count: 0 };
-            });
-
-            data.forEach((player, index) => {
-                let values = labels.map(label => {
-                    let stat = player.stats.find(stat => stat.map === label);
-                    let value = stat ? parseFloat(stat[key]) || 0 : 0;
-
-                    if (!meanValues[label]) {
-                        meanValues[label] = { sum: 0, count: 0 };
-                    }
-                    meanValues[label].sum += value;
-                    meanValues[label].count++;
-
-                    return value;
-                });
-
-                datasets.push({
-                    label: player.playerName,
-                    data: values,
-                    backgroundColor: colors[index % colors.length],
-                    borderColor: colors[index % colors.length],
-                    borderWidth: 1
-                });
-            });
-
-            let meanData = labels.map(label =>
-                meanValues[label].count > 0 ? meanValues[label].sum / meanValues[label].count : 0
-            );
-
-            datasets.push({
-                label: "Média Geral",
-                data: meanData,
-                backgroundColor: "black",
-                borderColor: "black",
-                borderWidth: 2,
-                borderDash: [5, 5]
-            });
-
-            charts[idCanvas] = new Chart(ctx, {
-                type: "bar",
-                data: {
-                    labels: labels,
-                    datasets: datasets
-                },
-                options: {
-                    indexAxis: "y",
-                    plugins: {
-                        legend: { position: "top" },
-                        title: { display: true, text: graphTitle }
-                    }
-                }
-            });
-        }
-    </script>
 </body>
 
 </html>
+
+<script>
+    let data = "";
+    let charts = {};
+    const colors = [
+        "rgba(255, 0, 0, 0.6)",     // Red
+        "rgba(0, 0, 255, 0.6)",     // Blue
+        "rgba(225, 225, 0, 0.6)",   // Yellow
+        "rgba(0, 200, 0, 0.6)",     // Green
+        "rgba(255, 100, 0, 0.6)",   // Orange
+        "rgba(0, 100, 0, 0.6)",     // Dark Green
+        "rgba(128, 0, 128, 0.6)",   // Purple
+        "rgba(0, 0, 128, 0.6)",     // Dark Blue
+    ];
+
+    // it all starts here
+    kickstartMyData();
+
+    async function kickstartMyData() {
+        try {
+            await getPlayersData();
+        } catch (error) {
+            console.error("Erro ao carregar dados:", error);
+            document.getElementById('loading-message').innerText = "Erro ao carregar os dados.";
+        }
+        loadPlayerComparer();
+    }
+
+    function loadPlayerComparer() {
+        let comparePlayers = document.querySelector(".compare-players");
+        let fullHTML = "";
+
+        data.forEach(value => {
+            fullHTML += '<input type="checkbox" id="' + value.playerName + '" value="' + value.playerName + '" name="' + value.playerName + '"';
+            fullHTML += '<label for="' + value.playerName + '">' + value.playerName + '</label>';
+        });
+
+        fullHTML += '<input type="submit" value="Selecionar Jogadores">';
+        comparePlayers.innerHTML = fullHTML;
+    }
+
+    function comparePlayers() {
+        let comparePlayers = document.querySelector(".pc");
+        let fullHTML = "";
+        let players = [];
+
+        data.forEach(player => {
+            if (document.getElementById(player.playerName).checked) {
+                players.push(player);
+            }
+        });
+
+        if (players.length < 1) {
+            destroyCharts(charts);
+        }
+
+        mapPlayersData(players);
+        kickstartMyGraphs(players);
+
+        // players.forEach(value => {
+        //     fullHTML += "<div><b>Nome:</b><p>" + value.playerName + "</p></div>";
+        //     value.stats.forEach(stat => {
+        //         fullHTML += "<div><b>Mapa:</b><p>" + stat.map + "</p></div>";
+        //         fullHTML += "<div><b>Rating Leetify:</b><p>" + stat.leetify_rating + "</p></div>";
+        //         fullHTML += "<div><b>Rating CT:</b><p>" + stat.ct_rating + "</p></div>";
+        //         fullHTML += "<div><b>Rating TR:</b><p>" + stat.t_rating + "</p></div>";
+        //         fullHTML += "<div><b>Partidas jogadas:</b><p>" + stat.matches_played + "</p></div>";
+        //         fullHTML += "<div><b>Vitórias (%):</b><p>" + stat.win_rate + "</p></div>";
+        //     })
+        // });
+
+        // comparePlayers.innerHTML = fullHTML;
+    }
+
+    function destroyCharts(chartsObj) {
+        if (charts?.winrateChart) {
+            charts.winrateChart.destroy();
+            charts.winrateChart = null;
+        }
+        if (charts?.leetifyChart) {
+            charts.leetifyChart.destroy();
+            charts.leetifyChart = null;
+        }
+        if (charts?.tSideChart) {
+            charts.tSideChart.destroy();
+            charts.tSideChart = null;
+        }
+        if (charts?.ctSideChart) {
+            charts.ctSideChart.destroy();
+            charts.ctSideChart = null;
+        }
+    }
+
+    async function getPlayersData() {
+        // adds a loading status to screen
+        document.getElementById('loading-message').innerText = "Carregando dados...";
+        document.getElementById('data-container').innerHTML = "";
+
+        // fetches data from server
+        const response = await fetch('/response');
+        data = await response.json();
+
+        // checks if there's any data received
+        if (!data.length) {
+            document.getElementById('loading-message').innerText = "Nenhum dado encontrado.";
+            return;
+        }
+
+        // removes loading
+        document.getElementById('loading-message').innerText = "";
+    }
+
+    function mapPlayersData(players) {
+        // creates a set of maps and the html that will be included at tables and graphs
+        let html = '';
+
+        // maps data for each player
+        players.forEach(player => {
+            html += `<h2>${player.playerName}</h2>`;
+            html += `<table>
+                            <tr>
+                                <th>Mapa</th>
+                                <th>Vitórias (%)</th>
+                                <th>Partidas</th>
+                                <th>Rating Leetify</th>
+                                <th>Rating TR</th>
+                                <th>Rating CT</th>
+                            </tr>`;
+
+            // win rates and matches played can't go lower than zero, but ratings don't have a minimum value
+            let bestStats = { win_rate: 0, matches_played: 0, leetify_rating: -Infinity, t_rating: -Infinity, ct_rating: -Infinity };
+            let tableData = [];
+
+            // this part was a mess, now it's a bit easier to check which data goes where
+            // maps each stat from player
+            player.stats.forEach(stat => {
+                let values = {
+                    win_rate: parseFloat(stat.win_rate.replace('%', '')) || 0,
+                    matches_played: parseInt(stat.matches_played) || 0,
+                    leetify_rating: parseFloat(stat.leetify_rating) || 0,
+                    t_rating: parseFloat(stat.t_rating) || 0,
+                    ct_rating: parseFloat(stat.ct_rating) || 0
+                };
+
+                // saves the lowest value in each stat
+                for (let key in values) {
+                    if (values[key] > bestStats[key]) {
+                        bestStats[key] = values[key];
+                    }
+                }
+
+                // this is the final formatted data that will end up at the table
+                tableData.push({ map: stat.map, values });
+            });
+
+            // adds data to table, formatting the best values of each column, as well as positives and negatives of ratings
+            tableData.forEach(({ map, values }) => {
+                html += `<tr>
+                                <td>${map}</td>
+                                <td class="${values.win_rate === bestStats.win_rate ? 'best' : ''}">${values.win_rate}%</td>
+                                <td class="${values.matches_played === bestStats.matches_played ? 'best' : ''}">${values.matches_played}</td>
+                                <td class="${values.leetify_rating === bestStats.leetify_rating ? 'best' : (values.leetify_rating >= 0 ? 'positive' : 'negative')}">${values.leetify_rating}</td>
+                                <td class="${values.t_rating === bestStats.t_rating ? 'best' : (values.t_rating >= 0 ? 'positive' : 'negative')}">${values.t_rating}</td>
+                                <td class="${values.ct_rating === bestStats.ct_rating ? 'best' : (values.ct_rating >= 0 ? 'positive' : 'negative')}">${values.ct_rating}</td>
+                            </tr>`;
+            });
+
+            html += '</table>';
+        });
+
+        document.getElementById('data-container').innerHTML = html;
+    }
+
+    function kickstartMyGraphs(players) {        
+        // draw graphs
+        drawGraph("winrateChart", "Vitórias (%)", players, "win_rate");
+        drawGraph("leetifyChart", "Leetify Rating", players, "leetify_rating");
+        drawGraph("tSideChart", "Rating TR", players, "t_rating");
+        drawGraph("ctSideChart", "Rating CT", players, "ct_rating");
+    }
+
+    function drawGraph(idCanvas, graphTitle, data, key) {
+        let ctx = document.getElementById(idCanvas).getContext("2d");
+
+        // to reload data of previously drawn graphs
+        if (charts[idCanvas]) {
+            charts[idCanvas].destroy();
+        }
+
+        let labels = new Set();
+        let datasets = [];
+        let meanValues = {};
+
+        data.forEach(player => {
+            player.stats.forEach(stat => labels.add(stat.map));
+        });
+
+        labels = Array.from(labels);
+
+        labels.forEach(label => {
+            meanValues[label] = { sum: 0, count: 0 };
+        });
+
+        data.forEach((player, index) => {
+            let values = labels.map(label => {
+                let stat = player.stats.find(stat => stat.map === label);
+                let value = stat ? parseFloat(stat[key]) || 0 : 0;
+
+                if (!meanValues[label]) {
+                    meanValues[label] = { sum: 0, count: 0 };
+                }
+                meanValues[label].sum += value;
+                meanValues[label].count++;
+
+                return value;
+            });
+
+            datasets.push({
+                label: player.playerName,
+                data: values,
+                backgroundColor: colors[index % colors.length],
+                borderColor: colors[index % colors.length],
+                borderWidth: 1
+            });
+        });
+
+        // this is the mean value of all players for each stat
+        let meanData = labels.map(label =>
+            meanValues[label].count > 0 ? meanValues[label].sum / meanValues[label].count : 0
+        );
+
+        datasets.push({
+            label: "Média Geral",
+            data: meanData,
+            backgroundColor: "black",
+            borderColor: "black",
+            borderWidth: 2,
+            borderDash: [5, 5]
+        });
+
+        charts[idCanvas] = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                indexAxis: "y",
+                plugins: {
+                    legend: { position: "top" },
+                    title: { display: true, text: graphTitle }
+                }
+            }
+        });
+    }
+</script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+        background-color: #f4f4f4;
+    }
+
+    #data-container {
+        width: 100%;
+        font-size: 15px;
+    }
+
+    .container {
+        width: 80%;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    th,
+    td {
+        border: 1px solid black;
+        padding: 12px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #007BFF;
+        color: white;
+    }
+
+    h1,
+    h2 {
+        color: #007BFF;
+    }
+
+    .chart-container {
+        width: 100%;
+        margin: 30px auto;
+    }
+
+    .positive {
+        color: green;
+    }
+
+    .negative {
+        color: red;
+    }
+
+    .best {
+        color: black;
+        font-weight: bold;
+        background-color: gold;
+    }
+</style>
